@@ -301,12 +301,12 @@ h1, h2, h3, h4, h5, h6, .font-heading {
 /*--------------------------------------------------------------
 # Header
 --------------------------------------------------------------*/
-/* Custom Navmenu */
+/* Burger Navmenu */
 .custom-navmenu {
   background: #0d1e2d;
 }
 .custom-navmenu .custom-menu, .custom-navmenu .custom-menu li {
-  padding: 0;
+  padding: 200;
   margin: 0;
   list-style: none;
 }
@@ -314,15 +314,21 @@ h1, h2, h3, h4, h5, h6, .font-heading {
   margin-bottom: 0;
   font-size: 20px;
 }
+
+/* color burger list */
 .custom-navmenu .custom-menu li a {
   color: #fff;
   padding: 10px 0 !important;
 }
+
+/* hovering burger menu list */
 .custom-navmenu .custom-menu li a:hover {
-  text-decoration: none;
+  text-decoration: underline yellow;
 }
+
+/* selected burger menu list */
 .custom-navmenu .custom-menu li.active a {
-  text-decoration: underline;
+  text-decoration: underline red;
 }
 .custom-navmenu h3 {
   font-size: 20px;
@@ -415,6 +421,7 @@ h1, h2, h3, h4, h5, h6, .font-heading {
   transform: rotate(-45deg);
 }
 
+/* The 'X' from hamburger menu */
 .burger:focus {
   outline: none;
 }
