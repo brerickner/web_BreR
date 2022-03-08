@@ -468,6 +468,19 @@ h1, h2, h3, h4, h5, h6, .font-heading {
 .footer .col {
   margin-top: -15px;
 }
-/* .footer .container {
-  margin: -50px;
-} */
+
+
+.footer .container {
+  margin-bottom: 50px;
+}
+
+.footer a i:hover {
+  color: red;
+}
+
+.about_bre {
+  margin-bottom: 20px;
+}
+.about_list {
+  margin-top: 20px;
+}
