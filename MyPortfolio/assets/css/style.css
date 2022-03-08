@@ -432,7 +432,7 @@ h1, h2, h3, h4, h5, h6, .font-heading {
 # Footer
 --------------------------------------------------------------*/
 .footer {
-  padding: 0 0 4rem 0;
+  padding: 0 0 3rem 0;
 }
 .footer a {
   color: #000;
@@ -446,7 +446,7 @@ h1, h2, h3, h4, h5, h6, .font-heading {
   background: #f8f9fa;
   position: relative;
   text-align: center;
-  color: #0d1e2d;
+  /* color: #0d1e2d; */
 }
 .social a span {
   display: inline-block;
@@ -455,21 +455,19 @@ h1, h2, h3, h4, h5, h6, .font-heading {
   top: 50%;
   transform: translate(-50%, -50%);
 }
-.social a:hover {
-  color: rgb(249, 253, 0);
+
+.footer .credits a:hover {
+  color: #9f0993;
 }
 
-.footer a:hover {
-  color: rgb(138, 0, 218)
-}
+
 
 .footer .credits {
   margin-top: -10px;
 }
-#socIcons {
+.footer .col {
   margin-top: -15px;
 }
-
-
-
-
+/* .footer .container {
+  margin: -50px;
+} */
