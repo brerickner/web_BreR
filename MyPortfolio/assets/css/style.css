@@ -202,6 +202,8 @@ h1, h2, h3, h4, h5, h6, .font-heading {
   position: relative;
   padding-left: 30px;
 }
+
+
 .list-line li:before {
   content: "";
   position: absolute;
@@ -454,5 +456,20 @@ h1, h2, h3, h4, h5, h6, .font-heading {
   transform: translate(-50%, -50%);
 }
 .social a:hover {
-  color: #000;
+  color: rgb(249, 253, 0);
 }
+
+.footer a:hover {
+  color: rgb(138, 0, 218)
+}
+
+.footer .credits {
+  margin-top: -10px;
+}
+#socIcons {
+  margin-top: -15px;
+}
+
+
+
+
