@@ -133,16 +133,20 @@ h1, h2, h3, h4, h5, h6, .font-heading {
 }
 .testimonial-wrap .testimonial {
   text-align: center;
-  max-width: 500px;
+  max-width: 90%;
   margin: 0 auto;
 }
+
 .testimonial-wrap .testimonial img {
+  /* border: solid; */
+  /* border-width: 1px; */
   border-radius: 50%;
   width: 120px;
   margin: 0 auto 30px auto;
 }
 .testimonial-wrap .testimonial blockquote p {
-  font-size: 20px;
+  font-size: calc(.25rem + .1vw);
+  width: 100%;
 }
 
 .h3 {
@@ -460,8 +464,6 @@ h1, h2, h3, h4, h5, h6, .font-heading {
   color: #9f0993;
 }
 
-
-
 .footer .credits {
   margin-top: -10px;
 }
@@ -469,9 +471,9 @@ h1, h2, h3, h4, h5, h6, .font-heading {
   margin-top: -15px;
 }
 
-
 .footer .container {
-  margin-bottom: 50px;
+  margin-top: 50px;
+  margin-bottom: 20px;
 }
 
 .footer a i:hover {
@@ -484,3 +486,17 @@ h1, h2, h3, h4, h5, h6, .font-heading {
 .about_list {
   margin-top: 20px;
 }
+
+.resume-buttons a {
+  margin-right: 20px
+}
+
+.about-photo {
+  border: solid 3px black;
+}
+
+
+/*Caswell Quote*/
+/* .testimonial .caz p {
+  font-size: calc(1rem + 1vw);
+} */
