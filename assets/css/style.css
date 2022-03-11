@@ -492,7 +492,7 @@ h1, h2, h3, h4, h5, h6, .font-heading {
 }
 
 .about-photo {
-  border: solid 3px black;
+  border: solid 5px black;
 }
 .sticky-content p {
   margin-top: -10px;
