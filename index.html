@@ -1,380 +1,608 @@
+
 <!DOCTYPE html>
 <html lang="en">
+  <head>
+    <title>WebBreR - Featuring Particles</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+    <style>
+      body {
+        font-family: Monospace;
+        background-color: #000000;
+        margin: 0px;
+        overflow: hidden;
+      }
 
-<head>
-  <meta charset="utf-8">
-  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+      #info {
+        color: #ffffff;
 
-  <title>Bre Rickner's Portfolio</title>
-  <meta content="Bre Rickner software developer professional portfolio" name="description">
-  <meta content="Software Developer Portfolio" name="keywords">
+        font-family: Monospace;
+        font-size: 13px;
+        text-align: center;
+        font-weight: bold;
 
-  <!-- Favicons -->
-  <link href="assets/img/bre_favi.png" rel="icon">
-  <link href="assets/img/bre_favi.png" rel="apple-touch-icon">
+        position: absolute;
+        top: 0px; width: 100%;
+        padding: 5px;
+      }
 
-  <!-- Google Fonts -->
-  <link href="https://fonts.googleapis.com/css?family=https://fonts.googleapis.com/css?family=Inconsolata:400,500,600,700|Raleway:400,400i,500,500i,600,600i,700,700i" rel="stylesheet">
+      a {
+        color: #0040ff;
+      }
+    </style>
+  </head>
+  <body>
 
-  <!-- Vendor CSS Files -->
-  <link href="assets/vendor/aos/aos.css" rel="stylesheet">
-  <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
-  <link href="assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
-  <link href="assets/vendor/swiper/swiper-bundle.min.css" rel="stylesheet">
+    <!-- For Magic Leap Support -->
+    <script src="js/three/examples/jsm/vr/HelioWebXRPolyfill.js"></script>
 
-  <!-- Template Main CSS File -->
-  <link href="assets/css/style.css" rel="stylesheet">
+    <!-- WebGL 2 shaders -->
+    <script id="vs-particles-2" type="x-shader/x-vertex">
+      uniform float pointSize;
 
-  <!-- =======================================================
-  * Template Name: MyPortfolio - v4.7.0
-  * Template URL: https://bootstrapmade.com/myportfolio-bootstrap-portfolio-website-template/
-  * Author: BootstrapMade.com
-  * License: https://bootstrapmade.com/license/
-  ======================================================== -->
-</head>
+      varying vec3 vPosition;
 
-<body>
+      void main() {
+        vPosition = position;
+        gl_PointSize = pointSize;
+        gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
+      }
+    </script>
+    <script>
+      
+    </script>
+    <script id="fs-particles-2" type="x-shader/x-fragment">
+      varying vec3 vPosition;
 
-  <!-- ======= Navbar ======= -->
-  <!-- Left Column -->
-  <div class="collapse navbar-collapse custom-navmenu" id="main-navbar">
-    <div class="container py-2 py-md-5">
-      <div class="row align-items-start">
-        <div class="col-md-2">
-          <ul class="custom-menu">
-            <li class="active"><a href="index.html">Home</a></li>
-            <li><a href="about.html">About Bre</a></li>
-            <li><a href="services.html">Services</a></li>
-            <li><a href="index.html">Projects</a></li>
-            <li><a href="contact.html">Contact</a></li>
-          </ul>
-        </div>
-        <!-- Center Column -->
-        <div class="col-md-6 d-none d-md-block  mr-auto">
-          <div class="tweet d-flex">
-            <div></div>
-          </div>
-        </div>
-        <!-- Right Column -->
-        <div class="col-md-4 d-none d-md-block">
-          <h3>Hire Me</h3>
-          <p> Freelance. Consulting. Collaboration.<br> <a href="contact.html">breanna.rickner@holbertonschool.com</a></p>
-          <a href="https://twitter.com/brerickner?ref_src=twsrc%5Etfw"
-                 class="twitter-follow-button" data-size="large" 
-                 data-show-count="false">Follow @brerickner\</a>
-        </div>
-      </div>
-    </div>
-  </div>
+      void main() {
+        float depth = smoothstep( 10.24, 1.0, gl_FragCoord.z / gl_FragCoord.w );
+        gl_FragColor = vec4( (vec3(0.0, 0.03, 0.05) + (vPosition * 0.25)), depth );
+      }
+    </script>
 
-  <!-- ======= MyPortfolio ======= -->
-  <nav class="navbar navbar-light custom-navbar">
-    <div class="container">
-      <a class="navbar-brand" href="index.html">MyPortfolio.</a>
-      <a href="#" class="burger" data-bs-toggle="collapse" data-bs-target="#main-navbar">
-        <span></span>
-      </a>
-    </div>
-  </nav>
+    <script type="module">
 
-  <main id="main">
+      import * as THREE from './js/three/build/three.module.js';
+      import { SimulationShader } from './js/SimulationShader.js';
+      import { Projector } from './js/three/examples/jsm/renderers/Projector.js';
+      import { GeometryUtils } from './js/three/examples/jsm/utils/GeometryUtils.js';
+      import { WEBVR } from './js/three/examples/jsm/vr/WebVR.js';
 
-    <!-- ======= Works Section ======= -->
-    <section class="section site-portfolio">
-      <div class="container">
-        <div class="row mb-5 align-items-center">
-          <div class="col-md-12 col-lg-6 mb-4 mb-lg-0" data-aos="fade-up">
-            <h2>Hey, I'm Bre!</h2>
-            <p class="mb-0">Fullstack Software Engineer &amp; 💡Idea Factory</p>
-          </div>
-          <div class="col-md-12 col-lg-6 text-start text-lg-end" data-aos="fade-up" data-aos-delay="100">
-            <div id="filters" class="filters">
-              <a href="#" data-filter="*" class="active">All</a>
-              <a href="#" data-filter=".xr">XR.</a>
-              <a href="#" data-filter=".projects">Projects.</a>
-              <a href="#" data-filter=".writing">#BreTalksTech.</a>
-              <a href="#" data-filter=".coding">Coding.</a>
-            </div>
-          </div>
-        </div>
-        <div id="portfolio-grid" class="row no-gutter" data-aos="fade-up" data-aos-delay="200">
-          <div class="item xr col-sm-6 col-md-4 col-lg-4 mb-4">
-            <a href="https://brerickner.github.io/brerickner/" class="item-wrap fancybox">
-              <div class="work-info">
-                <h3>Web Bre-R</h3>
-                <span>XR</span>
-              </div>
-              <img class="img-fluid" src="assets/img/img_1.svg">
-            </a>
-          </div>
+      function getQueryString(name, defaultValue) {
+        var query = window.location.search.substring(1);
+        var vars = query.split("&");
+        for (var i = 0; i < vars.length; i++) {
+          var pair = vars[i].split("=");
+          if (pair[0] == name) {
+            return unescape(pair[1]);
+          }
+        }
+        return defaultValue;
+      }
+  
 
-          <div class="item coding col-sm-6 col-md-4 col-lg-4 mb-4">
-            <a href="https://github.com/brerickner" class="item-wrap fancybox">
-              <div class="work-info">
-                <h3>Bre's Cat Food</h3>
-                <span>Coding</span>
-              </div>
-              <img class="img-fluid" src="assets/img/img_4.svg">
-            </a>
-          </div>
+      function getQueryValue(name, defaultValue) {
+        var value = getQueryString(name, null);
+        if (value == null) {
+          return defaultValue;
+        }
+        return parseInt(value, 10);
+      }
 
-          <div class="item projects col-sm-6 col-md-4 col-lg-4 mb-4">
-            <a href="work-single.html" class="item-wrap fancybox">
-              <div class="work-info">
-                <h3>FuzzFeeds</h3>
-                <span>Projects</span>
-              </div>
-              <img class="img-fluid" src="assets/img/img_2.svg">
-            </a>
-          </div>
+      var roomSize = new THREE.Vector3(3, 3, 3);
+      var textScale = 0.3;
 
-          <div class="item writing col-sm-6 col-md-4 col-lg-4 mb-4">
-            <a href="https://medium.com/@brerickner" class="item-wrap fancybox">
-              <div class="work-info">
-                <h3>Technical Writing</h3>
-                <span>#BreTalksTech</span>
-              </div>
-              <img class="img-fluid" src="assets/img/img_3.svg">
-            </a>
-          </div>
-          
-          <div class="item xr col-sm-6 col-md-4 col-lg-4 mb-4">
-            <a href="https://www.youtube.com/watch?v=arOfyB_nL7w" class="item-wrap fancybox">
-              <div class="work-info">
-                <h3>Bre-R Escape Room</h3>
-                <span>XR</span>
-              </div>
-              <img class="img-fluid" src="assets/img/img_5.svg">
-            </a>
-          </div>
+      var container, canvas, gl;
 
-          <div class="item writing col-sm-6 col-md-4 col-lg-4 mb-4">
-            <a href="https://medium.com/geekculture/how-the-internet-works-f06e70c9cf44" class="item-wrap fancybox">
-              <div class="work-info">
-                <h3>How the Internet Works</h3>
-                <span>#BreTalksTech</span>
-              </div>
-              <img class="img-fluid" src="assets/img/img_6.svg">
-            </a>
-          </div>
-        </div>
-      </div>
-    </section>
+      var scene, camera, light, renderer;
+      var geometry, geometry2, originGeometry, cube, mesh, material;
+      var roomMesh;
+      var projector = new Projector();
 
-    <!-- ======= Clients Section ======= -->
-    <!--<section class="section">
-      <div class="container">
-        <div class="row justify-content-center text-center mb-4">
-          <div class="col-5">
-            <h3 class="h3 heading">My Clients</h3>
-            <p>Lorem ipsum dolor sit amet consectetur adipisicing elit explicabo inventore.</p>
-          </div>
-        </div>
-        <div class="row">
-          <div class="col-4 col-sm-4 col-md-2">
-            <a href="#" class="client-logo"><img src="assets/img/logo-adobe.png" alt="Image" class="img-fluid"></a>
-          </div>
-          <div class="col-4 col-sm-4 col-md-2">
-            <a href="#" class="client-logo"><img src="assets/img/logo-uber.png" alt="Image" class="img-fluid"></a>
-          </div>
-          <div class="col-4 col-sm-4 col-md-2">
-            <a href="#" class="client-logo"><img src="assets/img/logo-apple.png" alt="Image" class="img-fluid"></a>
-          </div>
-          <div class="col-4 col-sm-4 col-md-2">
-            <a href="#" class="client-logo"><img src="assets/img/logo-netflix.png" alt="Image" class="img-fluid"></a>
-          </div>
-          <div class="col-4 col-sm-4 col-md-2">
-            <a href="#" class="client-logo"><img src="assets/img/logo-nike.png" alt="Image" class="img-fluid"></a>
-          </div>
-          <div class="col-4 col-sm-4 col-md-2">
-            <a href="#" class="client-logo"><img src="assets/img/logo-google.png" alt="Image" class="img-fluid"></a>
-          </div>
+      var data, texture, points;
+      var transformFeedback;
+      var originBuffer;
+      var font;
 
-        </div>
-      </div>
-    </section>-->
-    <!-- End Clients Section -->
+      var fboParticles, rtTexturePos, rtTexturePos2, simulationShader;
 
-    <!-- ======= Testimonials Section ======= -->
-    <section class="section pt-0">
-      <div class="container">
+      var particleCount = getQueryValue('particleCount', 100000);
+      var pointSize = getQueryValue('pointSize', 2);
+      var skipRemainder = getQueryValue('skipRemainder', 0);
 
-        <div class="testimonials-slider swiper" data-aos="fade-up" data-aos-delay="300">
-          <div class="swiper-wrapper">
-            <div class="swiper-slide">
-              <div class="testimonial-wrap">
-                <div class="testimonial">
-                  <img src="assets/img/Val-favicon.svg" alt="Avatar Image" class="img-fluid">
-                  <blockquote>
-                    <p>"I have worked with Bre on multiple projects, including writing a command-line interpreter
-                       from scratch and building a virtual reality drum simulator. Innovative thinking, thorough
-                       product testing, project organization and expert technical writing are just a few of the 
-                       skills that Bre brings to the table. She has the epitome of a growth mindset and employs 
-                       a highly determined strategy, and she constantly strives to understand the "how" and "why"
-                       behind what works and what doesn't."</p>
-                  </blockquote>
-                  <p>&mdash; Valerie Nierenberg</p>
-                </div>
-              </div>
-            </div>
+      var INT_MAX = 2147483647;
+
+      var maxColliders = 8;
+
+      var pickCoord = new THREE.Vector3(0.0, 0.0, 0.0);
+      var pickRay = new THREE.Ray();
+      var clickPlane = new THREE.Plane(new THREE.Vector3(0.0, 0.0, 1.0), roomSize.z*0.25);
+
+      var mouseCoordQueue = [];
+
+      var touchPoints = [];
+
+      var colliders = new Float32Array(maxColliders * 4);
+      var colliderMeshes = [];
+      var showColliders = false;
+
+      const CONTROLLER_COLLIDER_SIZE = 0.075;
+      var controller1, controller2;
+      var controllerMesh1, controllerMesh2;
+
+      var isWebGL2 = false;
+
+      function getFullscreenButton ( renderer ) {
+
+        var button = document.createElement( 'button' );
+        button.style.position = 'absolute';
+        button.style.right = '20px';
+        button.style.bottom = '20px';
+        button.style.width = '100px';
+        button.style.border = '0';
+        button.style.padding = '8px';
+        button.style.cursor = 'pointer';
+        button.style.backgroundColor = '#000';
+        button.style.color = '#fff';
+        button.style.fontFamily = 'sans-serif';
+        button.style.fontSize = '13px';
+        button.style.fontStyle = 'normal';
+        button.style.textAlign = 'center';
+        button.style.zIndex = '999';
+        button.textContent = 'FULLSCREEN';
+        button.onclick = function() {
+          if (renderer.domElement.requestFullscreen) {
+            renderer.domElement.requestFullscreen();
+          } else if (renderer.domElement.webkitRequestFullscreen) {
+            renderer.domElement.webkitRequestFullscreen();
+          } else if (renderer.domElement.mozRequestFullScreen) {
+            renderer.domElement.mozRequestFullScreen();
+          }
+        };
+
+        return button;
+
+      }
+
+      function inAR() {
+        if (!('getSession' in renderer.vr)) {
+          return false;
+        }
+        let session = renderer.vr.getSession();
+        return session && session.environmentBlendMode && session.environmentBlendMode != 'opaque';
+      }
+
+      function init() {
+        container = document.createElement( 'div' );
+        document.body.appendChild( container );
+
+        canvas = document.createElement( 'canvas' );
+
+        // Try first WebGL 2 context and fallback to WebGL 1
+        gl = canvas.getContext( 'webgl2', { antialias: false, xrCompatible: true } );
+        if (!gl) {
+          gl = canvas.getContext( 'experimental-webgl2', { antialias: false, xrCompatible: true } );
+        }
+
+        isWebGL2 = !!gl;
+
+        renderer = new THREE.WebGLRenderer( { canvas: canvas, context: gl } );
+        renderer.setSize( window.innerWidth, window.innerHeight );
+        renderer.sortObjects = false;
+        renderer.vr.enabled = true;
+        container.appendChild( renderer.domElement );
+
+        document.body.appendChild( getFullscreenButton( renderer ) );
+
+        let btnVR = WEBVR.createButton(
+            renderer, {
+          mode: 'immersive-vr',
+          sessionInit: {requiredFeatures: ['local-floor']}
+        });
+        btnVR.style.left = 'calc(50% - 110px)';
+        document.body.appendChild(btnVR);
+        let btnAR = WEBVR.createButton(
+            renderer, {
+          mode: 'immersive-ar',
+          sessionInit: {requiredFeatures: ['local-floor']}
+        });
+        btnAR.style.left = 'calc(50% + 10px)';
+        document.body.appendChild(btnAR);
+
+        scene = new THREE.Scene();
+
+        camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 0.01, roomSize.z * 10 );
+        camera.position.y = (roomSize.y/2) + 0.25;
+        camera.position.z = roomSize.z*0.2;
+        camera.lookAt( new THREE.Vector3(0, roomSize.y/2, -roomSize.z*0.25));
+        scene.add( camera );
+
+        controller1 = renderer.vr.getController( 0 );
+        scene.add( controller1 );
+
+        controller2 = renderer.vr.getController( 1 );
+        scene.add( controller2 );
+
+        var controllerMaterial = new THREE.MeshPhongMaterial({ color: 0x00DD22 });
+        var controllerGeometry = new THREE.IcosahedronGeometry(CONTROLLER_COLLIDER_SIZE, 1);
+        controllerMesh1 = new THREE.Mesh(controllerGeometry, controllerMaterial);
+        controllerMesh2 = new THREE.Mesh(controllerGeometry, controllerMaterial);
+        controller1.add( controllerMesh1 );
+        controller2.add( controllerMesh2 );
+
+        var fingerMaterial = new THREE.MeshPhongMaterial({ color: 0x00DD22 });
+        var fingerGeometry = new THREE.IcosahedronGeometry(1, 2);
+        showColliders = getQueryValue('colliders', 0) != 0;
+        for (var i = 0; i < maxColliders; ++i) {
+          colliderMeshes[i] = new THREE.Mesh(fingerGeometry, fingerMaterial);
+          scene.add(colliderMeshes[i]);
+        }
+
+        var textureLoader = new THREE.TextureLoader();
+        var backImage = textureLoader.load("media/textures/Back.png");
+        var ceilImage = textureLoader.load("media/textures/Ceiling.png");
+        var floorImage = textureLoader.load("media/textures/Floor.png");
+
+        var roomMaterialArray = [
+          new THREE.MeshBasicMaterial({ map: backImage, side: THREE.BackSide }),
+          new THREE.MeshBasicMaterial({ map: backImage, side: THREE.BackSide }),
+          new THREE.MeshBasicMaterial({ map: ceilImage, side: THREE.BackSide }),
+          new THREE.MeshBasicMaterial({ map: floorImage, side: THREE.BackSide }),
+          new THREE.MeshBasicMaterial({ map: backImage, side: THREE.BackSide }),
+          new THREE.MeshBasicMaterial({ map: backImage, side: THREE.BackSide })
+        ];
+        var roomGeometry = new THREE.BoxGeometry( roomSize.x, roomSize.y, roomSize.z );
+        roomMesh = new THREE.Mesh( roomGeometry, roomMaterialArray );
+        roomMesh.doubleSided = true;
+        roomMesh.position.y = roomSize.y/2;
+        scene.add( roomMesh );
+
+        renderer.vr.addEventListener('sessionstart', (ev) => {
+          // Hide for AR
+          if (inAR()) {
+            roomMesh.visible = false;
+            controllerMesh1.visible = false;
+            controllerMesh2.visible = false;
+          } else {
+            controllerMesh1.visible = true;
+            controllerMesh2.visible = true;
+          }
+        });
+        renderer.vr.addEventListener('sessionend', (ev) => {
+          roomMesh.visible = true;
+          controllerMesh1.visible = false;
+          controllerMesh2.visible = false;
+        });
+
+        if (isWebGL2) {
+          // Create DataTexture
+
+          var fontLoader = new THREE.FontLoader();
+          fontLoader.load( 'media/fonts/helvetiker_bold.typeface.json', function ( font ) {
+
+            var textGeo = new THREE.TextGeometry( "WebBreR!", {
+              size: 0.7,
+              height: 0.25,
+              curveSegments: 0,
+              font: font,
+              weight: "bold",
+              style: "normal",
+            });
+
+            textGeo.computeBoundingBox();
+            var bounds = textGeo.boundingBox;
+            textGeo.applyMatrix( new THREE.Matrix4().makeTranslation(
+              (bounds.max.x - bounds.min.x) * -0.5,
+              (bounds.max.y - bounds.min.y) * -0.5,
+              (bounds.max.z - bounds.min.z) * -0.5));
+
+            particleCount = Math.floor(particleCount / 3) * 3;
+
+            points = GeometryUtils.randomPointsInGeometry( textGeo, particleCount );
+
+            data = new Float32Array( particleCount * 4 );
+            for ( var i = 0, j = 0, l = data.length; i < l; i += 4, j += 1 ) {
+              data[ i ] = points[ j ].x;
+              data[ i + 1 ] = points[ j ].y;
+              data[ i + 2 ] = points[ j ].z;
+              data[ i + 3 ] = 0.0;
+            }
+
+            var velData = new Float32Array( particleCount * 4 );
+            for ( var i = 0, l = velData.length; i < l; i += 4 ) {
+              velData[ i ] = (Math.random() - 0.5) * 0.004;
+              velData[ i + 1 ] = (Math.random() - 0.5) * 0.004;
+              velData[ i + 2 ] = (Math.random() - 0.5) * 0.004;
+              velData[ i + 3 ] = 0.0;
+            }
+
+            var randomSeedData = new Uint32Array( particleCount );
+            for ( var i = 0; i < randomSeedData.length; ++i ) {
+              randomSeedData[ i ] = Math.random() * INT_MAX;
+            }
+
+            geometry = new THREE.BufferGeometry();
+            geometry.addAttribute( 'position', new THREE.BufferAttribute( data, 4 ).setDynamic( true ) );
+            geometry.addAttribute( 'velocity', new THREE.BufferAttribute( velData, 4 ).setDynamic( true ) );
+            geometry.addAttribute( 'randomSeed', new THREE.BufferAttribute( randomSeedData, 1, false, true ).setDynamic( true ) );
+            geometry2 = geometry.clone();
+
+            material = new THREE.ShaderMaterial( {
+              uniforms: {
+                "pointSize": { type: "f", value: pointSize }
+              },
+              vertexShader: document.getElementById( 'vs-particles-2' ).textContent,
+              fragmentShader: document.getElementById( 'fs-particles-2' ).textContent,
+              blending: THREE.AdditiveBlending,
+              depthWrite: false,
+              depthTest: true,
+              transparent: true
+            } );
+
+            transformFeedback = gl.createTransformFeedback();
+
+            originBuffer = gl.createBuffer();
+            gl.bindBuffer(gl.ARRAY_BUFFER, originBuffer);
+            gl.bufferData(gl.ARRAY_BUFFER, data, gl.STATIC_DRAW);
+
+            simulationShader = new SimulationShader(renderer, maxColliders);
+            simulationShader.setColliders(colliders);
+
+            mesh = new THREE.Points(geometry, material);
+            mesh.position.z = -roomSize.z*0.25;
+            mesh.position.y = roomSize.y/2;
             
-            <div class="swiper-slide">
-              <div class="testimonial-wrap">
-                <div class="testimonial">
-                  <img src="assets/img/Sang-favicon.png" alt="Avatar Image" class="img-fluid">
-                  <blockquote>
-                    <p>"I worked with Bre on our end of foundations project "Fuzz Feeds".
-                       She was very organized and showed up ready to work every single day.
-                       Her contagious work ethic made the whole project flow smoothly from
-                       start to finish. She brings a different level of creativity and 
-                       attention to detail to every project that she sets her sights on. 
-                       10/10 would have on any team in the future."</p>
-                  </blockquote>
-                  <p>&mdash; Sang Nguyen</p>
-                </div>
-              </div>
-            </div>
-            
-                    <div class="swiper-slide">
-              <div class="testimonial-wrap">
-                <div class="testimonial">
-                  <img src="assets/img/Caz-favicon.png" alt="Avatar Image" class="img-fluid">
-                  <blockquote class="caz">
-                    <p class="'mw-80 center">"I worked with Bre on a weekend jam project as our first mutual
-                       expedition into Unity. She stayed active and aggressive in her pursuit of answers for hours. 
-                       I learned more during my short time spent in meetings with her discussing bugs and solutions 
-                       than I did with a month-long boot camp experience over the same topic. She has a manner of
-                       approaching logic that makes communication over complex topics both comprehensive and understandable.
-                       Her motivation and ability to switch gears into a completely different logical path were inspiring. 
-                       To label her in three words: Inquisitive, Persistent, Comprehensive"</p>
-                  </blockquote>
-                  <p>&mdash; Caswell</p>
-                </div>
-              </div>
-            </div>
-            
-            <!-- End testimonial item -->
+            mesh.scale.set(textScale, textScale, textScale); 
+            scene.add(mesh);
 
-          </div>
-          <div class="swiper-pagination"></div>
-        </div>
+          } );
 
-      </div>
-    </section>
-    <!-- End Testimonials Section -->
+        }
 
-    <!-- ======= Services Section ======= -->
-        <section class="section">
-      <div class="container">
-        <div class="row mb-4 align-items-center">
-          <div class="col-md-6" data-aos="fade-up">
+        function onMouseUpdate(ev) {
+          let mouseDown = !!ev.buttons;
+          if (mouseDown) {
+            mouseCoordQueue.push(canvasToColliderVector(ev.clientX, ev.clientY));
+          }
+        }
 
-            <h2>Services</h2>
-            <p>Bre is a developer of many skills. Too many to list here, and if I don't know how to do it,
-              I know how to research and learn what it takes to get it done.
-            </p>
-          </div>
-        </div>
-      </div>
+        canvas.addEventListener( 'mousedown', onMouseUpdate, false )
+        canvas.addEventListener( 'mouseup', onMouseUpdate, false );
+        canvas.addEventListener( 'mousemove', onMouseUpdate, false );
 
-      <div class="site-section pb-0 services">
-        <div class="container">
-          <div class="row">
-            <div class="col-12 col-sm-6 col-md-6 col-lg-6 mb-5" data-aos="fade-up" data-aos-delay="">
-              <i class="bi bi-card-checklist"></i>
-              <h4 class="h4 mb-2"><strong>Web Development</strong></h4>
-              <p>Knowledge of the entire stack favoring a Test Driven Development approach</p>
-              <ul class="list-unstyled list-line">
-                <li>Application Architecture</li>
-                <li>ADA & WCAG Compliancy</li>
-                <li>Ongoing Website Maintenance</li>
-                <li>Front-end and Back-end Support</li>
-                <li>SEO Optimization</li>
-                <li>WordPress Support</li>
-              </ul>
-            </div>
-            <div class="col-12 col-sm-6 col-md-6 col-lg-6 mb-5" data-aos="fade-up" data-aos-delay="100">
-              <i class="bi bi-binoculars"></i>
-              <h4 class="h4 mb-2"><strong>XR Applications</strong></h4>
-              <p>Augmented and Virtual reality applications blending together reality and virtuality</p>
-              </p>
-              <ul class="list-unstyled list-line">
-                <li>Virtual & Augmented Reality Applications</li>
-                <li>ShaderGraph Development</li>
-                <li>Animation Development</li>
-                <li>Unity Engine Support</li>
-                <li>360-Degree Videos</li>
-                <li>C# Application Logic</li>
-              </ul>
-            </div>
-            <div class="col-12 col-sm-6 col-md-6 col-lg-6 mb-5" data-aos="fade-up" data-aos-delay="">
-              <i class="bi bi-brightness-high"></i>
-              <h4 class="h4 mb-2"><strong>Content Creator</strong></h4>
-              <p>Creating custom content you won't find on the stock photo websites.</p>
-              <ul class="list-unstyled list-line">
-                <li>Branded Content</li>
-                <li>Website Graphics</li>
-                <li>Logo Design</li>
-                <li>Technical Writing</li>
-                <li>ADA & WCAG Compliancy</li>
-              </ul>
-            </div>
-            <div class="col-12 col-sm-6 col-md-6 col-lg-6 mb-5" data-aos="fade-up" data-aos-delay="100">
-              <i class="bi bi-calendar4-week"></i>
-              <h4 class="h4 mb-2"><strong>IoT</strong></h4>
-              <p>Innovative ideas that use the <em>Internet of Things</em></p>
-              <ul class="list-unstyled list-line">
-                <li>Architecture Planning</li>
-                <li>Research Support</li>
-                <li>MATLAB Analysis Support </li>
-                <li>Serverless Alternatives</li>
-                <li>Big Data Consulting</li>
-              </ul>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-    <!-- End Services Section -->
+        function onTouchUpdate(ev) {
+          var touches = ev.touches;
+          for(var i = 0; i < touches.length; ++i) {
+            var touch = touches[i];
+            touchPoints.push(canvasToColliderVector(touch.clientX, touch.clientY));
+          }
+          ev.preventDefault();
+        }
 
-  </main>
-  <!-- End #main -->
+        canvas.addEventListener( 'touchstart', onTouchUpdate, false )
+        canvas.addEventListener( 'touchend', onTouchUpdate, false );
+        canvas.addEventListener( 'touchmove', onTouchUpdate, false );
+      }
 
-  <!-- ======= Footer ======= -->
-    <footer class="footer" role="contentinfo">
-    <div class="container">
-      <div class="row">
-        <div class="col-sm-12">
-          <p class="mb-1 text-md-center">&copy; Copyright Bre Rickner. All Rights Reserved</p>
-          <div class="credits">
-            <!--
-            All the links in the footer should remain intact.
-            You can delete the links only if you purchased the pro version.
-            Licensing information: https://bootstrapmade.com/license/
-            Purchase the pro version with working PHP/AJAX contact form: https://bootstrapmade.com/buy/?theme=MyPortfolio
-          -->
-          <p class="mb-1 text-md-center">
-            Original Template by <a href="https://bootstrapmade.com/">BootstrapMade</a> | 
-            Modification made by <a href="https://www.linkedin.com/in/brerickner/">Bre Rickner</a>
-          </p>
-          </div>
-        </div>
-      </div>
-    </div>
+      function onWindowResize() {
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize( window.innerWidth, window.innerHeight );
+      }
 
-  <a href="index.html" class="back-to-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
+      window.addEventListener( 'resize', onWindowResize, false );
 
-  <!-- Vendor JS Files -->
-  <script src="assets/vendor/aos/aos.js"></script>
-  <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-  <script src="assets/vendor/isotope-layout/isotope.pkgd.min.js"></script>
-  <script src="assets/vendor/swiper/swiper-bundle.min.js"></script>
-  <script src="assets/vendor/php-email-form/validate.js"></script>
-  <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
+      function canvasToColliderVector(x, y) {
+        pickCoord.x = ((x / canvas.clientWidth) * 2.0) - 1.0;
+        pickCoord.y = -((y / canvas.clientHeight) * 2.0) + 1.0;
+        pickCoord.z = 0.1;
+        pickCoord.unproject(camera);
+        pickRay.set(camera.position, pickCoord.sub(camera.position).normalize());
+        var point = new THREE.Vector3();
+        pickRay.intersectPlane(clickPlane, point);
+        return point;
+      }
 
-  <!-- Template Main JS File -->
-  <script src="assets/js/main.js"></script>
+      function vrCameraToColliderVector() {
+        pickCoord.x = 0;
+        pickCoord.y = 0;
+        pickCoord.z = 0.1;
+        pickCoord.unproject(vrCamera);
+        //vrCamera.getWorldDirection(pickCoord);
+        //pickCoord.unproject(vrCamera);
+        pickRay.set(vrCamera.position, pickCoord.sub(vrCamera.position).normalize());
+        var point = new THREE.Vector3();
+        pickRay.intersectPlane(clickPlane, point);
+        return point;
+      }
 
-</body>
+      function pointToCollider(index, active, vector, size) {
+        var o = index * 4;
 
+        if (index >= maxColliders)
+          return;
+
+        if (active) {
+          colliders[o] =   (vector.x - mesh.position.x) / textScale;
+          colliders[o+1] = (vector.y - mesh.position.y) / textScale;
+          colliders[o+2] = (vector.z - mesh.position.z) / textScale;
+        }
+        colliders[o+3] = active ? (size / textScale) : -1;
+
+        colliderMeshes[index].visible = active && showColliders;
+        if (active) {
+          colliderMeshes[index].position.x = vector.x;
+          colliderMeshes[index].position.y = vector.y;
+          colliderMeshes[index].position.z = vector.z;
+          colliderMeshes[index].scale.set(size, size, size);
+        }
+      }
+
+      function updateColliders() {
+        var fi = 0;
+
+        while (mouseCoordQueue.length) {
+          pointToCollider(fi, true, mouseCoordQueue.shift(), 0.05);
+          fi++;
+        }
+
+        while (touchPoints.length) {
+          pointToCollider(fi, true, touchPoints.shift(), 0.05);
+          fi++;
+        }
+
+        var vector = new THREE.Vector3();
+        vector.setFromMatrixPosition( controller1.matrixWorld );
+        pointToCollider(fi++, true, vector, CONTROLLER_COLLIDER_SIZE);
+
+        vector.setFromMatrixPosition( controller2.matrixWorld );
+        pointToCollider(fi++, true, vector, CONTROLLER_COLLIDER_SIZE);
+
+        /*var buttonPushed = false;
+        var gamepads = navigator.getGamepads();
+        for (var i = 0; i < gamepads.length; ++i) {
+          var gamepad = gamepads[i];
+          if (gamepad && gamepad.buttons[0].pressed) {
+            buttonPushed = true;
+          }
+        }
+
+        if (buttonPushed) {
+          var gazePoint = vrCameraToColliderVector();
+          if (gazePoint) {
+            pointToCollider(fi++, true, gazePoint, 0.075);
+          }
+        }*/
+
+        // Turn off any remaining colliders.
+        for (; fi < maxColliders; ++fi) {
+          pointToCollider(fi, false);
+        }
+      }
+
+      function transformFeedbackPass( gl, shader, source, target ) {
+        if (!source || !target)
+          return;
+
+        var sourcePosAttrib = source.attributes['position'];
+        var sourceVelAttrib = source.attributes['velocity'];
+        var sourceRandomSeedAttrib = source.attributes['randomSeed'];
+        var targetPosAttrib = target.attributes['position'];
+        var targetVelAttrib = target.attributes['velocity'];
+        var targetRandomSeedAttrib = target.attributes['randomSeed'];
+
+        function getWebGLBuffer(attribute) {
+          let webglBuffer = renderer.attributes.get(attribute);
+          if (webglBuffer) {
+            return webglBuffer.buffer;
+          }
+          return null;
+        }
+
+        var sourcePosBuffer = getWebGLBuffer(sourcePosAttrib);
+        var sourceVelBuffer = getWebGLBuffer(sourceVelAttrib);
+        var sourceRandomSeedBuffer = getWebGLBuffer(sourceRandomSeedAttrib);
+        var targetPosBuffer = getWebGLBuffer(targetPosAttrib);
+        var targetVelBuffer = getWebGLBuffer(targetVelAttrib);
+        var targetRandomSeedBuffer = getWebGLBuffer(targetRandomSeedAttrib);
+
+        if (targetPosBuffer && sourcePosBuffer) {
+          shader.bind();
+
+          gl.enableVertexAttribArray( shader.attributes.position );
+          gl.bindBuffer(gl.ARRAY_BUFFER, sourcePosBuffer);
+          gl.vertexAttribPointer( shader.attributes.position, 4, gl.FLOAT, false, 16, 0 );
+
+          gl.enableVertexAttribArray( shader.attributes.velocity );
+          gl.bindBuffer(gl.ARRAY_BUFFER, sourceVelBuffer);
+          gl.vertexAttribPointer( shader.attributes.velocity, 4, gl.FLOAT, false, 16, 0 );
+
+          gl.enableVertexAttribArray( shader.attributes.origin );
+          gl.bindBuffer(gl.ARRAY_BUFFER, originBuffer);
+          gl.vertexAttribPointer( shader.attributes.origin, 4, gl.FLOAT, false, 16, 0 );
+
+          gl.enableVertexAttribArray( shader.attributes.randomSeed );
+          gl.bindBuffer(gl.ARRAY_BUFFER, sourceRandomSeedBuffer);
+          gl.vertexAttribIPointer( shader.attributes.randomSeed, 1, gl.UNSIGNED_INT, 0, 0 );
+
+          gl.bindTransformFeedback(gl.TRANSFORM_FEEDBACK, transformFeedback);
+          gl.bindBufferBase(gl.TRANSFORM_FEEDBACK_BUFFER, 0, targetPosBuffer);
+          gl.bindBufferBase(gl.TRANSFORM_FEEDBACK_BUFFER, 1, targetVelBuffer);
+          gl.bindBufferBase(gl.TRANSFORM_FEEDBACK_BUFFER, 2, targetRandomSeedBuffer);
+
+          gl.enable(gl.RASTERIZER_DISCARD);
+          gl.beginTransformFeedback(gl.POINTS);
+
+          gl.drawArrays(gl.POINTS, 0, sourcePosAttrib.count /* sourcePosAttrib.itemSize*/);
+
+          gl.endTransformFeedback();
+          gl.disable(gl.RASTERIZER_DISCARD);
+
+          // Unbind the transform feedback for ARRAY_BUFFER fix.
+          gl.bindBufferBase(gl.TRANSFORM_FEEDBACK_BUFFER, 0, null);
+          gl.bindBufferBase(gl.TRANSFORM_FEEDBACK_BUFFER, 1, null);
+          gl.bindBufferBase(gl.TRANSFORM_FEEDBACK_BUFFER, 2, null);
+
+          gl.bindTransformFeedback(gl.TRANSFORM_FEEDBACK, null);
+
+          // No touchy
+          renderer.state.reset();
+
+         
+          gl.disableVertexAttribArray( shader.attributes.randomSeed );
+        }
+      }
+
+      var frameId = 0;
+      var fixedStep = 16.666666;
+      var remainder = 0;
+      function render(t) {
+        if (isWebGL2 && mesh) {
+          updateColliders();
+
+          var lastTime = simulationShader.getTime(t);
+          if (t - lastTime > fixedStep * 5) {
+            simulationShader.setTime(t);
+            lastTime = t - fixedStep;
+          }
+
+          while (remainder + t - lastTime >= fixedStep) {
+            lastTime += fixedStep;
+            simulationShader.setTime(lastTime);
+
+            if ( frameId % 2 === 0 ) {
+              transformFeedbackPass( renderer.getContext(), simulationShader, geometry2, geometry );
+              mesh.geometry = geometry2;
+            } else {
+              transformFeedbackPass( renderer.getContext(), simulationShader, geometry, geometry2 );
+              mesh.geometry = geometry;
+            }
+
+            frameId++;
+          }
+
+          material.uniforms.pointSize.value = inAR() ? pointSize * 2.0 : pointSize;
+
+          // Code smell.
+          scene.remove( mesh ); scene.add( mesh );
+
+          // Unless asked not to, accumulate the remainder of time for the next frame.
+          // Flag acts as a sort of regression test for http://crbug.com/883871 .
+          if (!skipRemainder)
+            remainder = t - lastTime;
+
+          // If requestAnimationFrame timestamp jumps a lot, reset it.
+          simulationShader.setTime(t);
+        }
+
+        renderer.render( scene, camera );
+      }
+
+      init();
+
+      renderer.setAnimationLoop( render );
+
+    </script>
+  </body>
 </html>
